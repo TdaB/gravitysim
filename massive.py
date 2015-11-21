@@ -24,8 +24,6 @@ class MassiveObject(object):
         self.a_y = 0
         self.t = 0
         self.color = color
-        #self.is_deleted = False
-        logger.info("Creating %s at (%s, %s)" % (self.color, self.x, self.y))
 
     def __eq__(self, m):
         return self.x == m.x and self.y == m.y
