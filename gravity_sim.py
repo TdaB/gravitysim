@@ -25,7 +25,7 @@ class Simulator(object):
         self.canvas=Canvas(tk, width=self.width, height=self.height, bg='black')
         self.masses = list()
         self.new_masses = list()
-        for _ in range(10):
+        for _ in range(20):
             size = randint(3, 7)
             m = MassiveObject(
                 size * 10**16,
