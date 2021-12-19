@@ -1,5 +1,4 @@
 import logging
-from gravity_equations import *
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -13,7 +12,6 @@ __all__ = ['MassiveObject']
 
 class MassiveObject(object):
     def __init__(self, mass, radius, center_x, center_y, v_x, v_y, color):
-        self.timestep = .01 # seconds
         self.mass = mass
         self.x = center_x
         self.y = center_y
@@ -22,16 +20,14 @@ class MassiveObject(object):
         self.v_y = v_y
         self.a_x = 0
         self.a_y = 0
-        self.t = 0
         self.color = color
 
     def __eq__(self, m):
-        return self.x == m.x and self.y == m.y
+        return self.__str__() == m.__str__()
 
     def __str__(self):
         to_return = ""
         to_return += "Color = " + self.color + '\n'
-        to_return += "t = " + str(self.t) + '\n'
         to_return += "x = " + str(self.x) + '\n'
         to_return += "y = " + str(self.y) + '\n'
         to_return += "v_x = " + str(self.v_x) + '\n'
