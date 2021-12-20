@@ -35,9 +35,9 @@ class Simulator(object):
         tk.mainloop()
 
     def init_masses(self):
-        for _ in range(100):
+        for _ in range(50):
             mass_multiplier = randint(1, 30)
-            radius_multiplier = randint(1, 10)
+            radius_multiplier = randint(1, 50)
             m = MassiveObject(
                 mass_multiplier * 2 * 10 ** 30,
                 radius_multiplier * 700 * 10 ** 6,
@@ -72,8 +72,8 @@ class Simulator(object):
 
     def update(self, m1, m2):
         d = distance(m1.x, m1.y, m2.x, m2.y)
-        if d <= m1.radius + m2.radius:
-            self.separate(m1, m2)
+        if d < m1.radius + m2.radius:
+            self.separate(m1, m2, d)
             m1.v_x, m2.v_x = elastic_headon_collision(m1.mass, m1.v_x, m2.mass, m2.v_x)
             m1.v_y, m2.v_y = elastic_headon_collision(m1.mass, m1.v_y, m2.mass, m2.v_y)
             return
@@ -83,7 +83,7 @@ class Simulator(object):
         old_a_y = m1.a_y
         m1.x += seconds_per_frame * (m1.v_x + .5 * (seconds_per_frame * m1.a_x)) / meters_per_pixel
         m1.y += seconds_per_frame * (m1.v_y + .5 * (seconds_per_frame * m1.a_y)) / meters_per_pixel
-        g_x, g_y = grav_force(m1, m2)
+        g_x, g_y = grav_force(m1, m2, d)
         m1.a_x = g_x / m1.mass
         m1.a_y = g_y / m1.mass
         m1.v_x += seconds_per_frame * .5 * (m1.a_x + old_a_x)
@@ -92,8 +92,24 @@ class Simulator(object):
         self.canvas.move(m1.canvas_id, m1.x - old_x, m1.y - old_y)
         logger.info("Updated %s from (%s, %s) to (%s, %s)" % (m1.color, old_x, old_y, m1.x, m1.y))
 
-    def separate(self, m1, m2):
-        
+    def separate(self, m1, m2, d):
+        separation_d = m1.radius + m2.radius - d
+        pixel_d = .5 * separation_d / meters_per_pixel
+
+        unit_x, unit_y = unit_vector(m1.x - m2.x, m1.y - m2.y)
+        new_x = m1.x + pixel_d * unit_x
+        new_y = m1.y + pixel_d * unit_y
+        self.canvas.move(m1.canvas_id, new_x - m1.x, new_y - m1.y)
+        m1.x = new_x
+        m1.y = new_y
+
+        unit_x, unit_y = -unit_x, -unit_y
+        new_x = m2.x + pixel_d * unit_x
+        new_y = m2.y + pixel_d * unit_y
+        self.canvas.move(m2.canvas_id, new_x - m2.x, new_y - m2.y)
+        m2.x = new_x
+        m2.y = new_y
+
 
     def draw_accel_vector(self, m):
         mag = distance(m.x, m.y, m.x + m.a_x, m.y + m.a_y)
